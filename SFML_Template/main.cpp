@@ -9,12 +9,14 @@
 
 int main()
 {
+	bool pause = false;
+
 	unsigned char update_timer = gbl::GAME::FRAMES_PER_UPDATE - 1;
 
 	unsigned short lenght = 0;
 	
 	sf::RectangleShape cell_shape(sf::Vector2f(gbl::MAP::CELL_SIZE - gbl::MAP::CELL_OUTLINE_THICKNESS, gbl::MAP::CELL_SIZE - gbl::MAP::CELL_OUTLINE_THICKNESS));
-	sf::RenderWindow window(sf::VideoMode(gbl::SCREEN::RESIZE * gbl::SCREEN::WIDTH, gbl::SCREEN::RESIZE * gbl::SCREEN::HEIGHT), "Snake game AI", sf::Style::Close);
+	sf::RenderWindow window(sf::VideoMode(gbl::SCREEN::RESIZE * gbl::SCREEN::WIDTH, gbl::SCREEN::RESIZE * gbl::SCREEN::HEIGHT), "SFML_Snake", sf::Style::Close);
 	window.setView(sf::View(sf::FloatRect(0, 0, gbl::SCREEN::WIDTH, gbl::SCREEN::HEIGHT)));
 
 	sf::Texture font_texture;
@@ -47,13 +49,45 @@ int main()
 		{
 			lag -= gbl::SCREEN::FRAME_DURATION;
 
-			while (window.pollEvent(event))
+			while (1 == window.pollEvent(event))
 			{
-				if (event.type == sf::Event::Closed)
+				switch (event.type)
+				{
+				case sf::Event::Closed:
+				{
 					window.close();
+
+					break;
+				}
+				case sf::Event::KeyPressed:
+				{
+					switch (event.key.code)
+					{
+					case sf::Keyboard::Space:
+					{
+						pause = 1 - pause;
+
+						break;
+					}
+					}
+				}
+				}
 			}
 
-			update_game(snake, map, random_generator);
+			if (0 == pause)
+			{
+				if (0 == update_timer)
+				{
+					update_timer = gbl::GAME::FRAMES_PER_UPDATE - 1;
+					update_game(snake, map, random_generator);
+				}
+				else
+				{
+					update_timer--;
+				}
+			}
+
+			//update_game(snake, map, random_generator);
 
 			window.clear();
 
